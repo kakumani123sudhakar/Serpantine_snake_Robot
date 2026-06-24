@@ -81,9 +81,8 @@ Where $\alpha \approx 0.05$ acts as a dampener to ensure smooth, natural transit
 ### Mechanical Design & Assembled Robot
 
 <p align="center">
-  <img src="media/snake_head_side_landscape.jpg" alt="Assembled Flipper Head Side View" width="32%">
-  <img src="media/snake_head_close_up_vertical.jpg" alt="Flipper Head Close Up" width="32%">
-  <img src="media/snake_head_front_vertical.jpg" alt="Flipper Head Front View" width="32%">
+  <img src="media/snake_head_side_landscape.jpg" alt="Assembled Flipper Head Side View" width="48%">
+  <img src="media/snake_head_front_vertical.jpg" alt="Flipper Head Front View" width="48%">
 </p>
 
 ### Mission Control Dashboard & Telemetry GUI
