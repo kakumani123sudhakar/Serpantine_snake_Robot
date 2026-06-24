@@ -2,7 +2,7 @@
 ### Integrated Multi-Gait Actuation, 3D CAD, and IoT Sensor Fusion Platform
 
 <p align="center">
-  <img src="media/cover_page.jpg" alt="Bio Inspired Serpentine Robot Flipper" width="100%">
+  <img src="media/cover_page.jpg" alt="Bio Inspired Serpentine Robot Flipper" width="500">
 </p>
 
 ---
@@ -76,13 +76,14 @@ Where $\alpha \approx 0.05$ acts as a dampener to ensure smooth, natural transit
 
 ---
 
-## 📸 Media Gallery
+## 📸 Photo Gallery
 
 ### Mechanical Design & Assembled Robot
 
 <p align="center">
-  <img src="media/snake_head_side_landscape.jpg" alt="Assembled Flipper Head Side View" width="48%">
-  <img src="media/snake_head_close_up_vertical.jpg" alt="Flipper Head Close Up" width="48%">
+  <img src="media/snake_head_side_landscape.jpg" alt="Assembled Flipper Head Side View" width="32%">
+  <img src="media/snake_head_close_up_vertical.jpg" alt="Flipper Head Close Up" width="32%">
+  <img src="media/snake_head_front_vertical.jpg" alt="Flipper Head Front View" width="32%">
 </p>
 
 ### Mission Control Dashboard & Telemetry GUI
@@ -103,25 +104,37 @@ The STServo GUI offers low-level calibration and individual control of the 12 ST
 
 ---
 
-## 🎥 Locomotion & Software Screen Recordings
+## 🎥 Video Gallery
 
-Here are videos demonstrating the snake's locomotion gaits and dashboard operations:
+### Locomotion Demonstration Clips
 
-### Robot Locomotion Demos
-<p align="center">
-  <video src="media/snake_locomotion_demo_3.mp4" width="45%" controls></video>
-  <video src="media/snake_locomotion_demo_4.mp4" width="45%" controls></video>
-</p>
-<p align="center">
-  <video src="media/snake_locomotion_demo_2.mp4" width="45%" controls></video>
-  <video src="media/snake_locomotion_demo_1.mp4" width="45%" controls></video>
-</p>
+Here are videos demonstrating the snake's actual mechanical movement in 3D-printed segments:
 
-### Software Dashboard & Control Interface
-<p align="center">
-  <video src="media/dashboard_screen_recording_1.mp4" width="45%" controls></video>
-  <video src="media/dashboard_screen_recording_2.mp4" width="45%" controls></video>
-</p>
+<table>
+  <tr>
+    <td width="50%" align="center"><b>Locomotion Demo 1</b><br><br><video src="media/snake_locomotion_demo_1.mp4" width="100%" controls></video></td>
+    <td width="50%" align="center"><b>Locomotion Demo 2</b><br><br><video src="media/snake_locomotion_demo_2.mp4" width="100%" controls></video></td>
+  </tr>
+  <tr>
+    <td width="50%" align="center"><b>Locomotion Demo 3</b><br><br><video src="media/snake_locomotion_demo_3.mp4" width="100%" controls></video></td>
+    <td width="50%" align="center"><b>Locomotion Demo 4</b><br><br><video src="media/snake_locomotion_demo_4.mp4" width="100%" controls></video></td>
+  </tr>
+  <tr>
+    <td width="50%" align="center"><b>Locomotion Demo 5</b><br><br><video src="media/snake_locomotion_demo_5.mp4" width="100%" controls></video></td>
+    <td width="50%" align="center"><b>Locomotion Demo 6</b><br><br><video src="media/snake_locomotion_demo_6.mp4" width="100%" controls></video></td>
+  </tr>
+</table>
+
+### Software Screen Recordings
+
+Here are screen recordings showcasing the real-time sensor fusion telemetry and mapping dashboard:
+
+<table>
+  <tr>
+    <td width="50%" align="center"><b>Dashboard Live Scan & Feeds</b><br><br><video src="media/dashboard_screen_recording_1.mp4" width="100%" controls></video></td>
+    <td width="50%" align="center"><b>GUI Telemetry Log</b><br><br><video src="media/dashboard_screen_recording_2.mp4" width="100%" controls></video></td>
+  </tr>
+</table>
 
 ---
 
