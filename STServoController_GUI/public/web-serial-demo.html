@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STServo Web Serial - Betaflight Style</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+        .card {
+            background: #2d2d2d;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 { color: #00d2ff; margin-bottom: 1.5rem; }
+        .status { margin: 1rem 0; padding: 0.5rem; border-radius: 4px; background: #3d3d3d; }
+        .connected { color: #00ff88; }
+        .disconnected { color: #ff4444; }
+        button {
+            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+            margin: 5px;
+        }
+        button:hover { transform: translateY(-2px); }
+        button:disabled { background: #555; cursor: not-allowed; }
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1.5rem; }
+        input { background: #3d3d3d; border: 1px solid #555; color: white; padding: 5px; border-radius: 4px; }
+        label { font-size: 0.9rem; color: #aaa; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>STServo Web Serial</h1>
+        <div id="status" class="status disconnected">Status: Not Connected</div>
+        
+        <button id="connectBtn">Connect to Servo Port</button>
+        <button id="pingBtn" disabled>Ping Servo (ID 1)</button>
+
+        <div class="controls">
+            <div>
+                <label>Servo ID</label><br>
+                <input type="number" id="servoId" value="1" min="0" max="253">
+            </div>
+            <div>
+                <label>Position (0-4095)</label><br>
+                <input type="number" id="posValue" value="2048" min="0" max="4095">
+            </div>
+        </div>
+        <button id="moveBtn" disabled style="width: 100%; margin-top: 10px;">Move to Position</button>
+        
+        <div id="log" style="margin-top: 1.5rem; font-family: monospace; font-size: 0.8rem; background: #000; padding: 10px; height: 150px; overflow-y: auto; border-radius: 4px;">
+            > System ready. Uses STServoSDK.js
+        </div>
+    </div>
+
+    <script type="module">
+        import { STServoSDK } from './STServoSDK.js';
+
+        const sdk = new STServoSDK();
+        const connectBtn = document.getElementById('connectBtn');
+        const pingBtn = document.getElementById('pingBtn');
+        const moveBtn = document.getElementById('moveBtn');
+        const statusDiv = document.getElementById('status');
+        const logDiv = document.getElementById('log');
+
+        function log(msg) {
+            const entry = document.createElement('div');
+            entry.textContent = `> ${msg}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        connectBtn.addEventListener('click', async () => {
+            if ('serial' in navigator) {
+                const success = await sdk.connect(115200);
+                if (success) {
+                    statusDiv.textContent = 'Status: Connected';
+                    statusDiv.className = 'status connected';
+                    pingBtn.disabled = false;
+                    moveBtn.disabled = false;
+                    log('Connected via STServoSDK.js!');
+                } else {
+                    log('Connection failed.');
+                }
+            } else {
+                alert('Web Serial API not supported in this browser. Please use Chrome or Edge.');
+            }
+        });
+
+        pingBtn.addEventListener('click', async () => {
+            const id = parseInt(document.getElementById('servoId').value);
+            log(`Pinging Servo ${id}...`);
+            const success = await sdk.ping(id);
+            if (success) {
+                log(`Servo ${id} responded!`);
+            } else {
+                log(`No response from Servo ${id}. Check ID or Baudrate.`);
+            }
+        });
+
+        moveBtn.addEventListener('click', async () => {
+            const id = parseInt(document.getElementById('servoId').value);
+            const pos = parseInt(document.getElementById('posValue').value);
+            
+            log(`Moving Servo ${id} to ${pos}...`);
+            await sdk.writePosEx(id, pos, 500, 50);
+            log('Move command sent.');
+            
+            // Wait slightly for move to start then read position
+            setTimeout(async () => {
+                const current = await sdk.readPosition(id);
+                if (current !== null) {
+                    log(`Current position reported: ${current}`);
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

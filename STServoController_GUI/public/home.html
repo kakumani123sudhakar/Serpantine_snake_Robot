@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STServo Pro Console | Web Serial Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --brand-primary: #00d2ff;
+            --brand-secondary: #3a7bd5;
+            --bg-dark: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+        }
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-primary:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4);
+        }
+        .console-log {
+            font-family: 'JetBrains Mono', monospace;
+            scrollbar-width: thin;
+        }
+        input[type="range"] {
+            accent-color: var(--brand-primary);
+        }
+        @keyframes pulse-cyan {
+            0% { box-shadow: 0 0 0 0 rgba(0, 210, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 210, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 210, 255, 0); }
+        }
+        .active-glow {
+            animation: pulse-cyan 2s infinite;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
+            <div class="flex items-center gap-3">
+                <div class="p-3 bg-cyan-500/20 rounded-2xl border border-cyan-500/30">
+                    <i data-lucide="cpu" class="w-8 h-8 text-cyan-400"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold tracking-tight">STServo <span class="text-gradient">Pro Console</span></h1>
+                    <p class="text-slate-400 text-sm">Web Serial API Architecture v2.0</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div id="connectionStatus" class="px-4 py-2 rounded-full glass flex items-center gap-2 text-sm font-medium border-rose-500/30 text-rose-400">
+                    <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                    Disconnected
+                </div>
+                <button id="connectBtn" class="btn-primary px-6 py-2.5 rounded-xl font-semibold flex items-center gap-2">
+                    <i data-lucide="plug"></i>
+                    Connect Hardware
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left Panel: Control & Discovery -->
+            <aside class="lg:col-span-4 flex flex-col gap-6">
+                <!-- Discovery Card -->
+                <div class="glass p-6 rounded-3xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-semibold flex items-center gap-2">
+                            <i data-lucide="radar" class="text-cyan-400"></i>
+                            Discovery
+                        </h2>
+                        <button id="scanBtn" class="text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1 rounded-lg transition-colors disabled:opacity-50" disabled>
+                            Start Scan
+                        </button>
+                    </div>
+                    <div id="servoList" class="flex flex-wrap gap-2">
+                        <p class="text-slate-500 text-sm italic">Scan to find active servos...</p>
+                    </div>
+                </div>
+
+                <!-- Manual Control Card -->
+                <div class="glass p-6 rounded-3xl">
+                    <h2 class="text-lg font-semibold flex items-center gap-2 mb-6">
+                        <i data-lucide="settings-2" class="text-cyan-400"></i>
+                        Live Control
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <label class="text-slate-400">Target Servo ID</label>
+                                <span id="idDisplay" class="font-mono text-cyan-400">1</span>
+                            </div>
+                            <input type="number" id="servoId" value="1" min="0" max="253" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 focus:border-cyan-500 outline-none transition-all">
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-sm">
+                                <label class="text-slate-400">Position Target</label>
+                                <span id="posDisplay" class="font-mono text-cyan-400">2048</span>
+                            </div>
+                            <input type="range" id="posRange" min="0" max="4095" value="2048" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="text-xs text-slate-500 uppercase tracking-widest">Speed</label>
+                                <input type="number" id="speedInput" value="500" class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-1.5 text-sm outline-none">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-xs text-slate-500 uppercase tracking-widest">Accel</label>
+                                <input type="number" id="accInput" value="50" class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-1.5 text-sm outline-none">
+                            </div>
+                        </div>
+
+                        <button id="moveBtn" class="w-full py-3 glass hover:bg-cyan-500/10 border-cyan-500/30 text-cyan-400 rounded-xl font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-50" disabled>
+                            <i data-lucide="send"></i>
+                            Apply Position
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Center/Right Panel: Telemetry & Visualization -->
+            <main class="lg:col-span-8 flex flex-col gap-6">
+                <!-- Stats Row -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="glass p-4 rounded-2xl flex flex-col items-center">
+                        <i data-lucide="gauge" class="w-5 h-5 text-cyan-400 mb-2"></i>
+                        <span id="telPos" class="text-xl font-bold">----</span>
+                        <span class="text-xs text-slate-500">Position</span>
+                    </div>
+                    <div class="glass p-4 rounded-2xl flex flex-col items-center">
+                        <i data-lucide="zap" class="w-5 h-5 text-yellow-400 mb-2"></i>
+                        <span id="telVolt" class="text-xl font-bold">--.-</span>
+                        <span class="text-xs text-slate-500">Voltage (V)</span>
+                    </div>
+                    <div class="glass p-4 rounded-2xl flex flex-col items-center">
+                        <i data-lucide="thermometer" class="w-5 h-5 text-rose-400 mb-2"></i>
+                        <span id="telTemp" class="text-xl font-bold">--°C</span>
+                        <span class="text-xs text-slate-500">Temp</span>
+                    </div>
+                    <div class="glass p-4 rounded-2xl flex flex-col items-center">
+                        <i data-lucide="activity" class="w-5 h-5 text-emerald-400 mb-2"></i>
+                        <span id="telLoad" class="text-xl font-bold">----</span>
+                        <span class="text-xs text-slate-500">Load</span>
+                    </div>
+                </div>
+
+                <!-- Telemetry Graph -->
+                <div class="glass p-6 rounded-3xl flex-grow min-h-[400px]">
+                    <h2 class="text-lg font-semibold flex items-center gap-2 mb-6 text-slate-300">
+                        <i data-lucide="line-chart" class="text-emerald-400"></i>
+                        Real-time Telemetry
+                    </h2>
+                    <div class="w-full h-64 lg:h-80">
+                        <canvas id="telemetryChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Console Output -->
+                <div class="glass p-4 rounded-2xl">
+                    <div class="flex items-center gap-2 mb-2 text-xs font-bold text-slate-500 uppercase">
+                        <i data-lucide="terminal" class="w-4 h-4"></i>
+                        Bridge Event Log
+                    </div>
+                    <div id="consoleLog" class="h-32 console-log text-xs overflow-y-auto bg-black/30 rounded-lg p-3 text-cyan-200/70 border border-white/5 space-y-1">
+                        <div>Welcome to STServo Pro Console. Connect your hardware to start.</div>
+                    </div>
+                </div>
+            </main>
+
+        </div>
+    </div>
+
+    <!-- Footer Credit -->
+    <footer class="mt-12 text-center text-slate-600 text-xs">
+        &copy; 2026 STServo Hybrid Systems &bull; Built with Web Serial API &bull; No Backend Required
+    </footer>
+
+    <script type="module">
+        import { STServoSDK } from './STServoSDK.js';
+
+        const sdk = new STServoSDK();
+        let telemetryInterval = null;
+        let chart = null;
+        let currentActiveId = 1;
+
+        // UI Elements
+        const connectBtn = document.getElementById('connectBtn');
+        const scanBtn = document.getElementById('scanBtn');
+        const moveBtn = document.getElementById('moveBtn');
+        const posRange = document.getElementById('posRange');
+        const posDisplay = document.getElementById('posDisplay');
+        const servoIdInput = document.getElementById('servoId');
+        const idDisplay = document.getElementById('idDisplay');
+        const connectionBadge = document.getElementById('connectionStatus');
+        const consoleLog = document.getElementById('consoleLog');
+        const servoListContainer = document.getElementById('servoList');
+
+        // Telemetry Displays
+        const telPos = document.getElementById('telPos');
+        const telVolt = document.getElementById('telVolt');
+        const telTemp = document.getElementById('telTemp');
+        const telLoad = document.getElementById('telLoad');
+
+        function log(msg, type = 'info') {
+            const time = new Date().toLocaleTimeString([], { hour12: false, fractionalSecondDigits: 3 });
+            const entry = document.createElement('div');
+            entry.className = type === 'error' ? 'text-rose-400' : (type === 'success' ? 'text-emerald-400' : '');
+            entry.innerHTML = `<span class="text-slate-500">[${time}]</span> ${msg}`;
+            consoleLog.appendChild(entry);
+            consoleLog.scrollTop = consoleLog.scrollHeight;
+        }
+
+        // Initialize Chart
+        function initChart() {
+            const ctx = document.getElementById('telemetryChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array(30).fill(''),
+                    datasets: [
+                        {
+                            label: 'Position',
+                            data: Array(30).fill(null),
+                            borderColor: '#00d2ff',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            shadowColor: 'rgba(0, 210, 255, 0.5)',
+                            shadowBlur: 10
+                        },
+                        {
+                            label: 'Load',
+                            data: Array(30).fill(null),
+                            borderColor: '#10b981',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    animation: false,
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            max: 4095, 
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#475569', font: { size: 10 } }
+                        },
+                        x: { display: false }
+                    }
+                }
+            });
+        }
+
+        // Event Listeners
+        connectBtn.addEventListener('click', async () => {
+            log('Initiating port request...');
+            const success = await sdk.connect(1000000); // STServo usually 1M
+            if (success) {
+                connectionBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500"></span> Connected';
+                connectionBadge.className = 'px-4 py-2 rounded-full glass flex items-center gap-2 text-sm font-medium border-emerald-500/30 text-emerald-400';
+                connectBtn.innerHTML = '<i data-lucide="check"></i> Connected';
+                connectBtn.className = 'glass px-6 py-2.5 rounded-xl border-emerald-500/30 text-emerald-400 font-semibold flex items-center gap-2 active-glow';
+                
+                scanBtn.disabled = false;
+                moveBtn.disabled = false;
+                log('Hardware handshake successful at 1MBaud.', 'success');
+                startTelemetry();
+                lucide.createIcons();
+            } else {
+                log('Hardware bridge error. Check USB connection.', 'error');
+            }
+        });
+
+        scanBtn.addEventListener('click', async () => {
+            log('Starting network discovery (Range: 0-20)...');
+            servoListContainer.innerHTML = '<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-cyan-400"></div> Scanning...';
+            const foundIds = await sdk.discover(0, 10);
+            
+            if (foundIds.length > 0) {
+                servoListContainer.innerHTML = '';
+                foundIds.forEach(id => {
+                    const chip = document.createElement('button');
+                    chip.className = 'px-3 py-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 text-xs font-bold hover:bg-cyan-500/20 transition-all';
+                    chip.textContent = `ID ${id}`;
+                    chip.onclick = () => {
+                        servoIdInput.value = id;
+                        idDisplay.textContent = id;
+                        currentActiveId = id;
+                        log(`Switching active control to ID ${id}`);
+                    };
+                    servoListContainer.appendChild(chip);
+                });
+                log(`Discovery complete. Found ${foundIds.length} servo(s).`, 'success');
+            } else {
+                servoListContainer.innerHTML = '<span class="text-rose-400 text-xs">No servos found.</span>';
+                log('Scan completed: Zero response.', 'error');
+            }
+        });
+
+        moveBtn.addEventListener('click', async () => {
+            const id = parseInt(servoIdInput.value);
+            const pos = parseInt(posRange.value);
+            const speed = parseInt(document.getElementById('speedInput').value);
+            const acc = parseInt(document.getElementById('accInput').value);
+            
+            log(`TX -> MOVE ID:${id} POS:${pos} SPD:${speed}`);
+            await sdk.writePosEx(id, pos, speed, acc);
+        });
+
+        posRange.oninput = function() {
+            posDisplay.textContent = this.value;
+        };
+
+        servoIdInput.oninput = function() {
+            idDisplay.textContent = this.value;
+            currentActiveId = parseInt(this.value);
+        };
+
+        function startTelemetry() {
+            if (telemetryInterval) clearInterval(telemetryInterval);
+            telemetryInterval = setInterval(async () => {
+                if (!sdk.port) return;
+                try {
+                    const data = await sdk.getTelemetry(currentActiveId);
+                    if (data) {
+                        telPos.textContent = data.position;
+                        telVolt.textContent = data.voltage.toFixed(1);
+                        telTemp.textContent = `${data.temperature}°C`;
+                        telLoad.textContent = data.load;
+
+                        // Update Chart
+                        chart.data.datasets[0].data.shift();
+                        chart.data.datasets[0].data.push(data.position);
+                        chart.data.datasets[1].data.shift();
+                        chart.data.datasets[1].data.push(data.load);
+                        chart.update('none');
+                    }
+                } catch (e) {
+                    // Ignore transient read errors during jitter
+                }
+            }, 100);
+        }
+
+        // Init
+        lucide.createIcons();
+        initChart();
+    </script>
+</body>
+</html>
