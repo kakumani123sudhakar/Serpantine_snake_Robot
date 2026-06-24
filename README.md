@@ -115,41 +115,31 @@ The STServo GUI offers low-level calibration and individual control of the 12 ST
 
 Here are videos demonstrating the snake's actual mechanical movement in 3D-printed segments:
 
-**Locomotion Demo 1**
-
-https://github.com/kakumani123sudhakar/Serpantine_snake_Robot/raw/main/media/snake_locomotion_demo_1.mp4
-
-**Locomotion Demo 2**
-
-https://github.com/kakumani123sudhakar/Serpantine_snake_Robot/raw/main/media/snake_locomotion_demo_2.mp4
-
-**Locomotion Demo 3**
-
-https://github.com/kakumani123sudhakar/Serpantine_snake_Robot/raw/main/media/snake_locomotion_demo_3.mp4
-
-**Locomotion Demo 4**
-
-https://github.com/kakumani123sudhakar/Serpantine_snake_Robot/raw/main/media/snake_locomotion_demo_4.mp4
-
-**Locomotion Demo 5**
-
-https://github.com/kakumani123sudhakar/Serpantine_snake_Robot/raw/main/media/snake_locomotion_demo_5.mp4
-
-**Locomotion Demo 6**
-
-https://github.com/kakumani123sudhakar/Serpantine_snake_Robot/raw/main/media/snake_locomotion_demo_6.mp4
+<table>
+  <tr>
+    <td width="50%" align="center"><b>Locomotion Demo 1</b><br><br><video src="https://github.com/kakumani123sudhakar/Serpantine_snake_Robot/raw/main/media/snake_locomotion_demo_1.mp4" width="100%" controls muted></video></td>
+    <td width="50%" align="center"><b>Locomotion Demo 2</b><br><br><video src="https://github.com/kakumani123sudhakar/Serpantine_snake_Robot/raw/main/media/snake_locomotion_demo_2.mp4" width="100%" controls muted></video></td>
+  </tr>
+  <tr>
+    <td width="50%" align="center"><b>Locomotion Demo 3</b><br><br><video src="https://github.com/kakumani123sudhakar/Serpantine_snake_Robot/raw/main/media/snake_locomotion_demo_3.mp4" width="100%" controls muted></video></td>
+    <td width="50%" align="center"><b>Locomotion Demo 4</b><br><br><video src="https://github.com/kakumani123sudhakar/Serpantine_snake_Robot/raw/main/media/snake_locomotion_demo_4.mp4" width="100%" controls muted></video></td>
+  </tr>
+  <tr>
+    <td width="50%" align="center"><b>Locomotion Demo 5</b><br><br><video src="https://github.com/kakumani123sudhakar/Serpantine_snake_Robot/raw/main/media/snake_locomotion_demo_5.mp4" width="100%" controls muted></video></td>
+    <td width="50%" align="center"><b>Locomotion Demo 6</b><br><br><video src="https://github.com/kakumani123sudhakar/Serpantine_snake_Robot/raw/main/media/snake_locomotion_demo_6.mp4" width="100%" controls muted></video></td>
+  </tr>
+</table>
 
 ### Software Screen Recordings
 
 Here are screen recordings showcasing the real-time sensor fusion telemetry and mapping dashboard:
 
-**Dashboard Live Scan & Feeds**
-
-https://github.com/kakumani123sudhakar/Serpantine_snake_Robot/raw/main/media/dashboard_screen_recording_1.mp4
-
-**GUI Telemetry Log**
-
-https://github.com/kakumani123sudhakar/Serpantine_snake_Robot/raw/main/media/dashboard_screen_recording_2.mp4
+<table>
+  <tr>
+    <td width="50%" align="center"><b>Dashboard Live Scan & Feeds</b><br><br><video src="https://github.com/kakumani123sudhakar/Serpantine_snake_Robot/raw/main/media/dashboard_screen_recording_1.mp4" width="100%" controls muted></video></td>
+    <td width="50%" align="center"><b>GUI Telemetry Log</b><br><br><video src="https://github.com/kakumani123sudhakar/Serpantine_snake_Robot/raw/main/media/dashboard_screen_recording_2.mp4" width="100%" controls muted></video></td>
+  </tr>
+</table>
 
 ---
 
